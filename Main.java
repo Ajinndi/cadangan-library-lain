@@ -6,3 +6,10 @@ public class Main {
         controller.jalan();
     }
 }
+
+/*
+================================================================================
+PENJELASAN KODE `Main.java`:
+- Kelas titik masuk utama (*entry point*) untuk menjalankan program aplikasi kafe.
+================================================================================
+*/

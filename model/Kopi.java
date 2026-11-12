@@ -2,24 +2,25 @@ package model;
 
 import java.util.List;
 
-public class Kopi extends MenuItem  {
+public class Kopi extends MenuItem {
     private int rum;
     private int es;
     private int gula;
     private int karamel;
+
     public Kopi(String id, String nama, double hargaBase, int stok) {
         super(id, nama, hargaBase, stok);
     }
-    public boolean pilihUkuran() {
-        return true;
-    }
 
-    
+    @Override
+    public boolean bisaPilihUkuran() { return true; }
+
+    @Override
     public void customize(List<Integer> customizations) {
         customize(konversiCustomisasi(customizations, 4));
     }
 
-   
+    @Override
     public void customize(int[] customizations) {
         int[] values = validasiPanjangArray(customizations, 4);
         rum = validasiRentang(values[0], 0, 1, "Rum");
@@ -28,18 +29,25 @@ public class Kopi extends MenuItem  {
         karamel = validasiRentang(values[3], 0, 5, "Karamel");
     }
 
- 
+    @Override
     public double hitungHargaTotal() {
         return getHargaBase() + (rum * 3000) + (karamel * 3000);
     }
 
-    
+    @Override
     public String getOrderDetail() {
         return getNama() + " | Rum: " + rum + ", Es: " + es + ", Gula: " + gula + ", Karamel: " + karamel;
     }
 
-   
+    @Override
     public List<String> getCustomizationPrompts() {
         return List.of("Rum (0-1)", "Es (0-5)", "Gula (0-5)", "Karamel (0-5)");
     }
 }
+
+/*
+================================================================================
+PENJELASAN KODE `Kopi.java`:
+- Turunan dari `MenuItem` khusus produk kopi yang mendukung pemilihan ukuran dan kustomisasi rasa.
+================================================================================
+*/

@@ -10,60 +10,49 @@ import model.Roti;
 import model.Teh;
 import util.InputUtil;
 import view.ObjectView;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class ObjectController {
     private final Scanner sc = new Scanner(System.in);
     private final ObjectView view = new ObjectView();
     
-    // Menggunakan Map murni tanpa tanda <> (Raw Type)
-    private final Map menuMap = new LinkedHashMap();
+    // Menerapkan Generics pada koleksi menu
+    private final List<MenuItem> menuItems = new ArrayList<>();
 
     public ObjectController() {
-        menuMap.put("M-01", new Kopi("M-01", "Kopi Susu", 18000, 5));
-        menuMap.put("M-02", new Teh("M-02", "Teh Tarik", 12000, 10));
-        menuMap.put("M-03", new Roti("M-03", "Roti Cokelat", 10000, 8));
+        menuItems.add(new Kopi("M-01", "Kopi Susu", 18000, 5));
+        menuItems.add(new Teh("M-02", "Teh Tarik", 12000, 10));
+        menuItems.add(new Roti("M-03", "Roti Cokelat", 10000, 8));
     }
 
     public void jalan() {
-        view.tampilkanMenu(new ArrayList(menuMap.values()));
+        tampilkanMenuGeneric(menuItems);
         boolean berjalan = true;
         while (berjalan) {
             view.tampilkanMenuAwal();
-            try {
-                int pilihan = InputUtil.getInt(sc);
-                switch (pilihan) {
-                    case 1:
-                        view.tampilkanMenu(new ArrayList(menuMap.values()));
-                        break;
-                    case 2:
-                        prosesPesanan();
-                        break;
-                    case 3:
-                        tampilkanMenuUrutHarga(); 
-                        break;
-                    case 4:
-                        hapusMenuHabis(); 
-                        break;
-                    case 0:
-                        berjalan = false;
-                        view.tampilkanPesan("Terima kasih sudah berkunjung!");
-                        break;
-                    default:
-                        view.tampilkanPesan("Pilihan menu tidak tersedia.");
-                }
-            } catch (NumberFormatException e) {
-                view.tampilkanPesan("Input menu harus berupa angka.");
+            int pilihan = InputUtil.getInt(sc);
+            switch (pilihan) {
+                case 1:
+                    tampilkanMenuGeneric(menuItems);
+                    break;
+                case 2:
+                    prosesPesanan();
+                    break;
+                case 0:
+                    berjalan = false;
+                    view.tampilkanPesan("Terima kasih sudah berkunjung!");
+                    break;
+                default:
+                    view.tampilkanPesan("Pilihan menu tidak tersedia.");
             }
         }
+    }
+
+    // Menggunakan Wildcard Generics (<? extends MenuItem>)
+    private void tampilkanMenuGeneric(List<? extends MenuItem> listMenu) {
+        view.tampilkanMenu(new ArrayList<>(listMenu));
     }
 
     private void prosesPesanan() {
@@ -94,49 +83,17 @@ public class ObjectController {
     }
 
     private MenuItem cariMenu(String id) {
-        MenuItem item = (MenuItem) menuMap.get(id.toUpperCase());
-        if (item == null) {
-            throw new MenuTidakDitemukanException("Menu dengan ID " + id + " tidak ada.");
-        }
-        return item;
+        return cariItemBerdasarkanId(menuItems, id);
     }
 
-    private void tampilkanMenuUrutHarga() {
-        List listMenu = new ArrayList(menuMap.values());
-        
-        // Comparator manual menggunakan Anonymous Class tanpa tanda <>
-        Collections.sort(listMenu, new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                MenuItem m1 = (MenuItem) o1;
-                MenuItem m2 = (MenuItem) o2;
-                return Double.compare(m1.getHargaBase(), m2.getHargaBase());
-            }
-        });
-
-        view.tampilkanPesan("\n--- Menu Berdasarkan Harga Termurah ---");
-        view.tampilkanMenu(listMenu);
-    }
-
-    // Menggunakan Iterator murni tanpa tanda <> sama sekali (Raw Type + Casting manual)
-    private void hapusMenuHabis() {
-        Iterator iterator = menuMap.entrySet().iterator();
-        int jumlahDihapus = 0;
-        
-        while (iterator.hasNext()) {
-            Map.Entry entry = (Map.Entry) iterator.next();
-            MenuItem item = (MenuItem) entry.getValue();
-            
-            if (item.getStok() <= 0) {
-                iterator.remove();
-                view.tampilkanPesan("Menu " + item.getNama() + " dihapus dari sistem (stok habis).");
-                jumlahDihapus++;
+    // Menggunakan Generic Method dengan parameter tipe <T extends MenuItem>
+    private <T extends MenuItem> T cariItemBerdasarkanId(List<T> items, String id) {
+        for (T item : items) {
+            if (item.getId().equalsIgnoreCase(id)) {
+                return item;
             }
         }
-        
-        if (jumlahDihapus == 0) {
-            view.tampilkanPesan("Tidak ada menu dengan stok habis.");
-        }
+        throw new MenuTidakDitemukanException("Menu dengan ID " + id + " tidak ada.");
     }
 
     private int inputJumlahValid(MenuItem item) {
@@ -145,8 +102,6 @@ public class ObjectController {
                 int jumlah = view.inputJumlah(sc);
                 item.validasiJumlahPesanan(jumlah);
                 return jumlah;
-            } catch (NumberFormatException e) {
-                view.tampilkanPesan("Jumlah harus berupa angka.");
             } catch (InputTidakValidException | StokTidakCukupException e) {
                 view.tampilkanPesan(e.getMessage() + " Silakan masukkan jumlah lagi.");
             }
@@ -155,16 +110,13 @@ public class ObjectController {
 
     private boolean inputKustomisasiValid(MenuItem item) {
         while (true) {
-            List customizations = new ArrayList();
+            List<Integer> customizations = new ArrayList<>();
             try {
-                for (Object obj : item.getCustomizationPrompts()) {
-                    String namaKustomisasi = (String) obj;
+                for (String namaKustomisasi : item.getCustomizationPrompts()) {
                     customizations.add(view.inputKustomisasi(sc, namaKustomisasi));
                 }
                 item.customize(customizations);
                 return true;
-            } catch (NumberFormatException e) {
-                view.tampilkanPesan("Kustomisasi harus berupa angka. Silakan masukkan ulang semua kustomisasi.");
             } catch (InputTidakValidException e) {
                 view.tampilkanPesan(e.getMessage() + " Silakan masukkan ulang semua kustomisasi.");
             }
@@ -174,13 +126,7 @@ public class ObjectController {
     private double hitungTotal(MenuItem item, int jumlah) {
         while (true) {
             view.tampilkanMetodeHarga(item);
-            int pilihan;
-            try {
-                pilihan = InputUtil.getInt(sc);
-            } catch (NumberFormatException e) {
-                view.tampilkanPesan("Pilihan harus berupa angka.");
-                continue;
-            }
+            int pilihan = InputUtil.getInt(sc);
 
             try {
                 switch (pilihan) {
@@ -198,14 +144,27 @@ public class ObjectController {
                             view.tampilkanPesan("Ukuran hanya tersedia untuk minuman.");
                             break;
                         }
-                        String pilihanUkuran = view.inputUkuran(sc);
-                        EnumUkuran ukuran = EnumUkuran.valueOf(pilihanUkuran.toUpperCase());
+                        String pilihanUkuran = view.inputUkuran(sc).toUpperCase();
+                        
+                        // Validasi ukuran manual tanpa IllegalArgumentException
+                        EnumUkuran ukuran = null;
+                        if (pilihanUkuran.equals("SMALL")) {
+                            ukuran = EnumUkuran.SMALL;
+                        } else if (pilihanUkuran.equals("MEDIUM")) {
+                            ukuran = EnumUkuran.MEDIUM;
+                        } else if (pilihanUkuran.equals("LARGE")) {
+                            ukuran = EnumUkuran.LARGE;
+                        }
+
+                        if (ukuran == null) {
+                            view.tampilkanPesan("Ukuran tidak valid. Pilih SMALL, MEDIUM, atau LARGE.");
+                            break;
+                        }
+                        
                         return item.hitungHargaTotal(jumlah, ukuran);
                     default:
                         view.tampilkanPesan("Pilihan perhitungan tidak tersedia.");
                 }
-            } catch (IllegalArgumentException e) {
-                view.tampilkanPesan("Ukuran tidak valid. Pilih SMALL, MEDIUM, atau LARGE.");
             } catch (InputTidakValidException | StokTidakCukupException e) {
                 view.tampilkanPesan(e.getMessage());
                 return -1;
@@ -213,3 +172,13 @@ public class ObjectController {
         }
     }
 }
+
+/*
+================================================================================
+PENJELASAN KODE `ObjectController.java`:
+1. Menerapkan Generics: Menggunakan `List<? extends MenuItem>` untuk fleksibilitas list 
+   dan Generic Method `<T extends MenuItem>` pada fungsi pencarian item berdasarkan ID.
+2. Bebas Exception Bawaan: Tidak ada `NumberFormatException` maupun `IllegalArgumentException` 
+   karena input angka dan ukuran teks divalidasi secara manual.
+================================================================================
+*/

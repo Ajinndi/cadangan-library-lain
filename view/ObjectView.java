@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ObjectView {
-    public void tampilkanMenu(List menuItems) {
+    // Menerapkan Bounded Wildcard Generic (<? extends MenuItem>)
+    public void tampilkanMenu(List<? extends MenuItem> menuItems) {
         System.out.println("\nMenu Coffee Shop");
-        for (Object obj : menuItems) {
-            MenuItem item = (MenuItem) obj;
+        for (MenuItem item : menuItems) {
             System.out.println(item.getId() + ": " + item.getNama() + " | Harga: " + rupiah(item.getHargaBase()) + " | Stok: " + item.getStok());
         }
         System.out.println();
@@ -19,8 +19,6 @@ public class ObjectView {
         System.out.println("\nSistem pesan coffee shop");
         System.out.println("1. Tampilkan menu");
         System.out.println("2. Pesan menu");
-        System.out.println("3. Tampilkan menu urut harga (Comparator Manual)");
-        System.out.println("4. Bersihkan menu stok habis (Iterator Manual)");
         System.out.println("0. Keluar");
         System.out.print("Pilih menu: ");
     }
@@ -59,7 +57,7 @@ public class ObjectView {
     }
 
     public void tampilkanStruk(MenuItem item, int jumlah, double total) {
-        System.out.println("\n--- Struk Pesanan ---");
+        System.out.println("\nstruk pesan");
         System.out.println("ID Menu: " + item.getId());
         System.out.println("Detail: " + item.getOrderDetail());
         System.out.println("Jumlah: " + jumlah);
@@ -76,3 +74,12 @@ public class ObjectView {
         return "Rp " + nilai;
     }
 }
+
+/*
+================================================================================
+PENJELASAN KODE `ObjectView.java`:
+- Bertugas menampilkan antarmuka teks ke konsol serta menerima masukan data dari pengguna.
+- Menggunakan parameter `List<? extends MenuItem>` agar fungsi `tampilkanMenu` dapat 
+  menerima berbagai koleksi turunan kelas MenuItem secara generik.
+================================================================================
+*/

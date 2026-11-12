@@ -10,7 +10,16 @@ public enum EnumUkuran {
     EnumUkuran(double pengaliHarga) {
         this.kalihrg = pengaliHarga;
     }
+    
     public double getPengaliHarga() {
         return kalihrg;
     }
 }
+
+/*
+================================================================================
+PENJELASAN KODE `EnumUkuran.java`:
+- Menyimpan data pilihan ukuran dan pengali harganya tanpa memanggil fungsi `valueOf` 
+  yang berisiko menimbulkan `IllegalArgumentException`.
+================================================================================
+*/

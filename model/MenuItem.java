@@ -9,6 +9,7 @@ public abstract class MenuItem implements Customizable {
     private final String nama;
     private final double hargaBase;
     private int stok;
+
     public MenuItem(String id, String nama, double hargaBase, int stok) {
         if (id == null || id.isBlank()) throw new InputTidakValidException("ID menu tidak boleh kosong.");
         if (nama == null || nama.isBlank()) throw new InputTidakValidException("Nama menu tidak boleh kosong.");
@@ -20,22 +21,12 @@ public abstract class MenuItem implements Customizable {
         this.stok = stok;
     }
 
-    public String getId() {
-        return id;
-    }
-    public String getNama() {
-        return nama;
-    }
-    public double getHargaBase() {
-        return hargaBase;
-    }
-    public int getStok() {
-        return stok;
-    }
+    public String getId() { return id; }
+    public String getNama() { return nama; }
+    public double getHargaBase() { return hargaBase; }
+    public int getStok() { return stok; }
 
-    public boolean bisaPilihUkuran() {
-        return false;
-    }
+    public boolean bisaPilihUkuran() { return false; }
 
     public void validasiJumlahPesanan(int jumlah) {
         if (jumlah <= 0) throw new InputTidakValidException("Jumlah pesanan harus lebih dari 0.");
@@ -65,7 +56,8 @@ public abstract class MenuItem implements Customizable {
     }
 
     protected int[] konversiCustomisasi(List<Integer> customizations, int jumlahDiharapkan) {
-        if (customizations == null || customizations.size() != jumlahDiharapkan) throw new InputTidakValidException("Jumlah kustomisasi tidak sesuai.");
+        if (customizations == null || customizations.size() != jumlahDiharapkan) 
+            throw new InputTidakValidException("Jumlah kustomisasi tidak sesuai.");
 
         int[] values = new int[jumlahDiharapkan];
         int index = 0;
@@ -78,12 +70,14 @@ public abstract class MenuItem implements Customizable {
     }
 
     protected int[] validasiPanjangArray(int[] customizations, int jumlahDiharapkan) {
-        if (customizations == null || customizations.length != jumlahDiharapkan) throw new InputTidakValidException("Jumlah kustomisasi tidak sesuai.");
+        if (customizations == null || customizations.length != jumlahDiharapkan) 
+            throw new InputTidakValidException("Jumlah kustomisasi tidak sesuai.");
         return customizations;
     }
 
     protected int validasiRentang(int jumlah, int minimum, int maksimum, String namaKustomisasi) {
-        if (jumlah < minimum || jumlah > maksimum) throw new InputTidakValidException(namaKustomisasi + " harus antara " + minimum + " dan " + maksimum + ".");
+        if (jumlah < minimum || jumlah > maksimum) 
+            throw new InputTidakValidException(namaKustomisasi + " harus antara " + minimum + " dan " + maksimum + ".");
         return jumlah;
     }
 
@@ -91,3 +85,12 @@ public abstract class MenuItem implements Customizable {
     public abstract String getOrderDetail();
     public abstract List<String> getCustomizationPrompts();
 }
+
+/*
+================================================================================
+PENJELASAN KODE `MenuItem.java`:
+- Kelas abstrak utama yang mengimplementasikan `Customizable`.
+- Memanfaatkan tipe data generik seperti `List<Integer>` dan `List<String>` untuk 
+  mengatur parameter kustomisasi produk secara aman.
+================================================================================
+*/

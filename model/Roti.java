@@ -2,7 +2,7 @@ package model;
 
 import java.util.List;
 
-public class Roti extends MenuItem  {
+public class Roti extends MenuItem {
     private int gula;
     private int meses;
     private int karamel;
@@ -11,12 +11,12 @@ public class Roti extends MenuItem  {
         super(id, nama, hargaBase, stok);
     }
 
-  
+    @Override
     public void customize(List<Integer> customizations) {
         customize(konversiCustomisasi(customizations, 3));
     }
 
-  
+    @Override
     public void customize(int[] customizations) {
         int[] values = validasiPanjangArray(customizations, 3);
         gula = validasiRentang(values[0], 0, 5, "Gula");
@@ -24,18 +24,25 @@ public class Roti extends MenuItem  {
         karamel = validasiRentang(values[2], 0, 5, "Karamel");
     }
 
-    
+    @Override
     public double hitungHargaTotal() {
         return getHargaBase() + (meses * 500) + (karamel * 3000);
     }
 
-    
+    @Override
     public String getOrderDetail() {
         return getNama() + " | Gula: " + gula + ", Meses: " + meses + ", Karamel: " + karamel;
     }
 
-  
+    @Override
     public List<String> getCustomizationPrompts() {
         return List.of("Gula (0-5)", "Meses (0-5)", "Karamel (0-5)");
     }
 }
+
+/*
+================================================================================
+PENJELASAN KODE `Roti.java`:
+- Turunan dari `MenuItem` untuk kategori makanan (roti) tanpa opsi ukuran minuman.
+================================================================================
+*/
